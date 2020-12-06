@@ -1,14 +1,14 @@
 def setup():
-    size(400,400)
+    size(400,400,P3D)
     frameRate(20)
     fullScreen()
 
 class crazySmiley():
     def __init__(self):
         self._eye_size = 25
-        self._mouth_size = (8,10)
-        self.face_color=(random(255),random(255),random(255),random(150,255))
-        self.eye_color=(random(255),random(255),random(255),random(255))
+        self._mouth_size = (10,25)
+        self.face_color=(random(255),random(255),random(255))
+        self.eye_color=(random(255),random(255),random(255),random(100,255))
 
         self._eye_offset = 0
         self._pupil_offset = 0
@@ -33,30 +33,47 @@ class crazySmiley():
         self.mouth()
 
     def head(self):
+        pushMatrix()
         noStroke()
         fill(*self.face_color)
-        circle(0,0,100)
-        stroke(0)
+        sphere(100)
+        stroke(1)
+        popMatrix()
     
     def eyes(self):
+        pushMatrix()
+        translate(0,0,100)
         noStroke()
         fill(*self.eye_color)
         circle(25,0,self.eye_size)
         circle(-25,0,self.eye_size)
+    
+        pushMatrix()
         fill(0)
+        translate(0,0,1)
         circle(25,0,self.pupil_size)
         circle(-25,0,self.pupil_size)
         stroke(0)
+        popMatrix()
+        popMatrix()
         
     def mouth(self):
+        pushMatrix()
+        translate(0,0,100)
         strokeWeight(self.mouth_size[0])
         line(-self.mouth_size[1],30,self.mouth_size[1],30)
         strokeWeight(1)
+        popMatrix()
         
-    def place(self,x,y,deg=0,zoom=1.0):
+    def place(self,x=0,y=0,z=0,deg_x=0,deg_y=0,deg_z=0,zoom=1.0):
         pushMatrix()
-        translate(x,y)
-        rotate(radians(deg))
+        
+        translate(x,y,z)
+        
+        rotateX(radians(deg_x))
+        rotateY(radians(deg_y))
+        rotateZ(radians(deg_z))
+        
         scale(zoom)
         self.draw()
         popMatrix()
@@ -67,7 +84,6 @@ class crazySmiley():
         self._mouth_offset = mouth*random(-1,1)
     
             
-        
 def encircle(radius,num):
     for i in range(num):
         x = radius*sin(i*2*PI/num)
@@ -79,7 +95,7 @@ def crazyWheel(cs,i,radius,num):
     for coord in encircle(radius,num):
         cs=crazySmiley()
         cs.randomize(mouth=6,eyes=5,pupils=10)
-        cs.place(*coord,deg=i*3,zoom=random(1.0,2.0))
+        cs.place(*coord,z=0,deg_y=i*3,zoom=2.0)
 
 def lfo(period,shape='saw'):
     if shape=='saw':
@@ -88,17 +104,20 @@ def lfo(period,shape='saw'):
         return (frameCount//period)%2
     elif shape=='sine':
         return sin(frameCount*2*PI/period)
-    
+
+
 def draw():
-    translate(600,400)
     background(0)
-    i=frameCount%300
+    i=frameCount%360
+    
     pushMatrix()
-    rotate(-i/50.0)
+    translate(600,400,0)
+    
+    #rotate(i/50.0)
     cs = crazySmiley()
     radius =100*(lfo(50,'sine')+1)
-    num = int(20*lfo(50)+7)
-    crazyWheel(cs,i,radius,num)
+    num = int(5*lfo(50)+7)
+    crazyWheel(cs,-i,radius*2.0,num)
     
     #cs.place(i,i,i*10)
     #cs=crazySmiley()
