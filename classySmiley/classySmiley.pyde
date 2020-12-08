@@ -1,15 +1,19 @@
 def setup():
+    global img
+    img = loadImage("jvhs.jpg")
     size(400,400,P3D)
     frameRate(20)
     fullScreen()
 
+
 class crazySmiley():
-    def __init__(self):
+    def __init__(self,img):
+        
         self._eye_size = 25
         self._mouth_size = (10,25)
         self.face_color=(random(255),random(255),random(255))
         self.eye_color=(random(255),random(255),random(255),random(100,255))
-
+        self.img=img
         self._eye_offset = 0
         self._pupil_offset = 0
         self._mouth_offset = 0
@@ -36,7 +40,10 @@ class crazySmiley():
         pushMatrix()
         noStroke()
         fill(*self.face_color)
-        sphere(100)
+        head=createShape(SPHERE,100)
+        head.setTexture(self.img)
+        shape(head)
+        #sphere()
         stroke(1)
         popMatrix()
     
@@ -91,9 +98,9 @@ def encircle(radius,num):
         yield (x,y)
 
 
-def crazyWheel(cs,i,radius,num):
+def crazyWheel(cs,i,radius,num,img):
     for coord in encircle(radius,num):
-        cs=crazySmiley()
+        cs=crazySmiley(img)
         cs.randomize(mouth=6,eyes=5,pupils=10)
         cs.place(*coord,z=0,deg_y=i*3,zoom=2.0)
 
@@ -107,6 +114,7 @@ def lfo(period,shape='saw'):
 
 
 def draw():
+    global img
     background(0)
     i=frameCount%360
     
@@ -114,14 +122,15 @@ def draw():
     translate(600,400,0)
     
     #rotate(i/50.0)
-    cs = crazySmiley()
+    cs = crazySmiley(img)
+    cs.place()
     radius =100*(lfo(50,'sine')+1)
     num = int(5*lfo(50)+7)
-    crazyWheel(cs,-i,radius*2.0,num)
+    #crazyWheel(cs,-i,radius*2.0,num,img)
     
     #cs.place(i,i,i*10)
     #cs=crazySmiley()
     #cs.randomize(eyes=2,pupils=10,mouth=10)
     #cs.place(100-i,100-i,0,1+i*0.01)
-    
     popMatrix()
+    #saveFrame('frames/###.png')
